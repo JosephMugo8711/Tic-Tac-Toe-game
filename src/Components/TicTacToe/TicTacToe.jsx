@@ -1,152 +1,133 @@
-import React, {useState, useRef} from "react";
-import './TicTacToe.css'
-import circle_icon from "../Assets/circle.png"
-import cross_icon from "../Assets/cross.png"
+import React, { useState, useRef } from "react";
+import "./TicTacToe.css";
+import circle_icon from "../Assets/circle.png";
+import cross_icon from "../Assets/cross.png";
+
+const TicTacToe = () => {
+
+  // State to keep track of the number of moves
+  const [count, setCount] = useState(0);
+  // State to lock the board after the game ends
+  const [lock, setLock] = useState(false);
+  // Reference to the title element for updating the game status
+  const titleRef = useRef(null);
+  // State to store the current state of each box
+  const [boxes, setBoxes] = useState(Array(9).fill(null));
 
 
-// Storage for our game
-let data = ["", "", "", "", "", "", "", "", ""];
-
-const   TicTacToe = () => {
-
-    //  State for counting moves and locking the board
-    let [count, setCount] = useState(0);
-    let [lock, setLock] = useState(false);
-
-    // Reference for the title
-    let titleRef = useRef(null);
-
-    // Reference for the boxes
-    let box1 = useRef(null);
-    let box2 = useRef(null);
-    let box3 = useRef(null);
-    let box4 = useRef(null);
-    let box5 = useRef(null);
-    let box6 = useRef(null);
-    let box7 = useRef(null);
-    let box8 = useRef(null);
-    let box9 = useRef(null);
-
-
-    // Array of box reference
-    let box_array = [box1, box2, box3, box4, box5, box6, box7, box8, box9]
-
-    // Function to toggle between X and O
-    const toggle = (e, num) => {
-        
-        if (lock){
-            return 0;
-        }
-        if (count%2===0)
-        {
-            e.target.innerHTML = `<img src='${cross_icon}'>`;
-            data[num] = "x";
-            setCount(++count);
-        }
-        else{
-            e.target.innerHTML = `<img src='${circle_icon}'>`;
-            data[num] = "o";
-            setCount(++count);
-
-        }
-        checkWin();
-
+   // Function to toggle between X and O
+  const toggle = (index) => {
+    if (lock || boxes[index]) {
+      return;
     }
 
-    //  Function to check for a winner
-    const checkWin = () => {
-        // Logic for checking winning conditions
-        // Update the title if a player wins
-        if(data[0]===data[1] && data[1]===data[2] && data[2]!=="")
-        {
-            won(data[2]);
+    const newBoxes = [...boxes];
+    newBoxes[index] = count % 2 === 0 ? "x" : "o";
 
-        }
-        else if(data[3]===data[4] && data[4]===data[5] && data[5]!=="")
-        {
-            won(data[5]);
-        }
-        else if(data[6]===data[7] && data[7]===data[8] && data[8]!=="")
-        {
-            won(data[8]);
-        }
-        else if(data[0]===data[3] && data[3]===data[6] && data[6]!=="")
-        {
-            won(data[6]);
-        }
-        else if(data[1]===data[4] && data[4]===data[7] && data[7]!=="")
-        {
-            won(data[7]);
-        }
-        else if(data[2]===data[5] && data[5]===data[8] && data[8]!=="")
-        {
-            won(data[8]);
-        }
-        else if(data[0]===data[4] && data[4]===data[8] && data[8]!=="")
-        {
-            won(data[8]);
-        }
-        else if(data[0]===data[1] && data[1]===data[2] && data[2]!=="")
-        {
-            won(data[2]);
-        }
-        else if(data[2]===data[4] && data[4]===data[6] && data[6]!=="")
-        {
-            won(data[6]);
-        }
+    setBoxes(newBoxes);
+    setCount(count + 1);
+
+    checkWin(newBoxes);
+  };
+
+  // Function to check for a winner
+  const checkWin = (boxes) => {
+     // Define winning combinations
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    // Check each winning combination
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (boxes[a] && boxes[a] === boxes[b] && boxes[a] === boxes[c]) {
+         // If a player wins, call the 'won' function
+        won(boxes[a]);
+        return;
+      }
     }
+
+     // If all boxes are filled and no one wins, it's a draw
+    if (count === 9) {
+      setTitle("It's a draw!");
+      setLock(true);
+    }
+  };
 
     // Function to handle a win
+  const won = (winner) => {
+     // Lock the board and update the title with the winner
+    setLock(true);
+    setTitle(
+      `Congratulations: ${
+        winner === "x" ? "Cross" : "Circle"
+      } Wins`
+    );
+  };
 
-    const won = (winner) => {
-        // Lock the board and update the title with the winner
-        setLock(true);
-        if(winner === "x")
-        {
-            titleRef.current.innerHTML = `Congratulations: <img src=${cross_icon}> Wins`;
-        }
-        else{
-            titleRef.current.innerHTML = `Congratulations: <img src=${circle_icon}> Wins`;
+  // Function to update the title
+  const setTitle = (title) => {
+    titleRef.current.innerHTML = title;
+  };
 
-        }
-    }
+  // Function to reset the game
+  const reset = () => {
+    // Reset the board, count, and unlock the board
+    setLock(false);
+    setCount(0);
+    setTitle("Tic Tac Toe<span>Game</span>");
+    setBoxes(Array(9).fill(null));
+  };
 
-    // Function to reset the game
-    const reset = () => {
-        // REset the board, count, and unlock the board
-        setLock(false);
-        data = ["", "", "", "", "", "", "", "", ""];
-        titleRef.current.innerHTML = 'Tic Tac Toe<span>Game</span>'
-        box_array.map((e) => {
-            e.current.innerHTML = "";
+  return (
+    <div className="container">
+        {/* Display the game title */}
+      <h1 className="title" ref={titleRef}>
+        Tic Tac Toe<span>Game</span>
+      </h1>
+      {/* Display the game board */}
+      <div className="board">
+        {Array.from({ length: 3 }, (_, row) => (
+          <div className={`row${row + 1}`} key={row}>
+            {Array.from({ length: 3 }, (_, col) => (
+              <div
+                key={row * 3 + col}
+                className="boxes"
+                onClick={() => toggle(row * 3 + col)}
+              >
+                {/* Display X or O icon based on the box state */}
+                {boxes[row * 3 + col] === "x" && (
+                  <img
+                    src={cross_icon}
+                    alt="Cross Icon"
+                    className="icon"
+                  />
+                )}
+                {boxes[row * 3 + col] === "o" && (
+                  <img
+                    src={circle_icon}
+                    alt="Circle Icon"
+                    className="icon"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+       {/* Reset button to start a new game */}
+      <button className="reset" onClick={reset}>
+        Reset
+      </button>
+    </div>
+  );
+};
 
-        })        
-    }
-
-    return (
-        <div className="container">
-            <h1 className="title" ref={titleRef}>Tic Tac Toe<span>Game</span></h1>
-            <div className="board">
-                <div className="row1">
-                    <div className="boxes" ref={box1} onClick={(e)=>{toggle(e,0)}}></div>
-                    <div className="boxes" ref={box2} onClick={(e)=>{toggle(e,1)}}></div>
-                    <div className="boxes" ref={box3} onClick={(e)=>{toggle(e,2)}}></div>
-                </div>
-                <div className="row2">
-                    <div className="boxes" ref={box4} onClick={(e)=>{toggle(e,3)}}></div>
-                    <div className="boxes" ref={box5} onClick={(e)=>{toggle(e,4)}}></div>
-                    <div className="boxes" ref={box6} onClick={(e)=>{toggle(e,5)}}></div>
-                </div>
-                <div className="row3">
-                    <div className="boxes" ref={box7} onClick={(e)=>{toggle(e,6)}}></div>
-                    <div className="boxes" ref={box8} onClick={(e)=>{toggle(e,7)}}></div>
-                    <div className="boxes" ref={box9} onClick={(e)=>{toggle(e,8)}}></div>
-                </div>
-
-            </div>
-            <button className="reset" onClick={() => {reset()}}>Reset</button>
-        </div>
-    )
-}
-
-export default TicTacToe
+export default TicTacToe;
