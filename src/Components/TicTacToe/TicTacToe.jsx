@@ -4,17 +4,19 @@ import circle_icon from "../Assets/circle.png"
 import cross_icon from "../Assets/cross.png"
 
 
-// storage for our game
+// Storage for our game
 let data = ["", "", "", "", "", "", "", "", ""];
 
 const   TicTacToe = () => {
 
+    //  State for counting moves and locking the board
     let [count, setCount] = useState(0);
     let [lock, setLock] = useState(false);
-    // create reference for our title
+
+    // Reference for the title
     let titleRef = useRef(null);
 
-    // create ref for the boxes
+    // Reference for the boxes
     let box1 = useRef(null);
     let box2 = useRef(null);
     let box3 = useRef(null);
@@ -26,9 +28,12 @@ const   TicTacToe = () => {
     let box9 = useRef(null);
 
 
+    // Array of box reference
     let box_array = [box1, box2, box3, box4, box5, box6, box7, box8, box9]
 
+    // Function to toggle between X and O
     const toggle = (e, num) => {
+        
         if (lock){
             return 0;
         }
@@ -48,7 +53,10 @@ const   TicTacToe = () => {
 
     }
 
+    //  Function to check for a winner
     const checkWin = () => {
+        // Logic for checking winning conditions
+        // Update the title if a player wins
         if(data[0]===data[1] && data[1]===data[2] && data[2]!=="")
         {
             won(data[2]);
@@ -88,7 +96,10 @@ const   TicTacToe = () => {
         }
     }
 
+    // Function to handle a win
+
     const won = (winner) => {
+        // Lock the board and update the title with the winner
         setLock(true);
         if(winner === "x")
         {
@@ -100,7 +111,9 @@ const   TicTacToe = () => {
         }
     }
 
+    // Function to reset the game
     const reset = () => {
+        // REset the board, count, and unlock the board
         setLock(false);
         data = ["", "", "", "", "", "", "", "", ""];
         titleRef.current.innerHTML = 'Tic Tac Toe<span>Game</span>'
